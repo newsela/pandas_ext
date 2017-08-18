@@ -1,6 +1,7 @@
 """SFDC handler for reading from SFDC."""
 from os import environ as env
 
+import grequests
 from jinja2 import Environment
 import pandas as pd
 import requests
@@ -51,15 +52,18 @@ def sfdc_metadata(sobject: str, fetch_all=False) -> str:
     return [meta['name'] for meta in metadata['fields']]
 
 
-def patch_sfdc(sf_url, data):
+def patch_sfdc(data):
     payload = _get_endpoint_payload()
     route = payload['route'] + '/sfdc/patch/v20.0'
 
-    params = dict(sf_url=sf_url, data=data)
-    response = requests.patch(
-        route,
+    params = [
+        dict(sf_url=items['sf_url'], data=items['patch_data'])
+        for items in data
+    ]
+    responses = (grequests.patch(
+        url=route,
         headers=payload['headers'],
-        params=params,
-    )
-    response.raise_for_status()
-    return response.json()
+        params=param,
+    ) for param in params)
+    results = grequests.map(responses, size=25)
+    return results
