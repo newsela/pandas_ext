@@ -1,7 +1,7 @@
 """SFDC handler for reading from SFDC."""
+from concurrent.futures import ThreadPoolExecutor
 from os import environ as env
 
-import grequests
 from jinja2 import Environment
 import pandas as pd
 import requests
@@ -60,10 +60,12 @@ def patch_sfdc(data):
         dict(sf_url=items['sf_url'], data=items['patch_data'])
         for items in data
     ]
-    responses = (grequests.patch(
-        url=route,
-        headers=payload['headers'],
-        params=param,
-    ) for param in params)
-    results = grequests.map(responses, size=25)
-    return results
+    with ThreadPoolExecutor(max_workers=25) as executor:
+        responses = executor.map(
+            requests.patch, (dict(
+                url=route,
+                headers=payload['headers'],
+                params=param,
+            ) for param in params)
+        )
+    return responses
