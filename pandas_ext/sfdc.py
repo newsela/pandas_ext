@@ -52,9 +52,23 @@ def sfdc_metadata(sobject: str, fetch_all=False) -> str:
     return [meta['name'] for meta in metadata['fields']]
 
 
-def patch_sfdc(data):
+def patch_sfdc(sf_url, data):
     payload = _get_endpoint_payload()
     route = payload['route'] + '/sfdc/patch/v20.0'
+
+    params = dict(sf_url=sf_url, data=data)
+    response = requests.patch(
+        route,
+        headers=payload['headers'],
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def async_patch_sfdc(data):
+    payload = _get_endpoint_payload()
+    route = payload['route'] + '/sfdc/async_patch/v20.0'
 
     params = [
         dict(sf_url=items['sf_url'], data=items['patch_data'])
