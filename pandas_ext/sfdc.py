@@ -78,10 +78,10 @@ def async_patch_sfdc(data):
     ]
     with ThreadPoolExecutor(max_workers=25) as executor:
         responses = executor.map(
-            requests.patch, **(dict(
+            requests.patch, **[dict(
                 url=route,
                 headers=payload['headers'],
                 params=param,
-            ) for param in params)
+            ) for param in params]
         )
     return responses
