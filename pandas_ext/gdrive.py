@@ -172,9 +172,11 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
         raise('The file must reside in a folder that is shared with '
               'pydrive@namely.com.')
 
-    metadata['last_mod_by_email'] = (
-        metadata['lastModifyingUser']['emailAddress']
-    )
+    if 'lastModifyingUser' in metadata:
+        metadata['last_mod_by_email'] = (
+            metadata['lastModifyingUser']['emailAddress']
+        )
+        del metadata['lastModifyingUser']
 
     if not fetch_all:
         metadata = {
@@ -183,7 +185,6 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
             if k in meta_fields +
             ['folder_id', 'last_mod_by_email']
         }
-        del metadata['lastModifyingUser']
         del metadata['parents']
         Metadata = namedtuple('MetaData', metadata.keys())
         return Metadata(**metadata)
