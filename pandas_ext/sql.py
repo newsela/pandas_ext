@@ -1,4 +1,7 @@
-"""SQL handler for reading from SQL service"""
+"""SQL handler for reading from SQL service.
+
+>>> df = read_sql("rich_REDSHIFT", "SELECT 1;")
+"""
 from os import environ as env
 
 from jinja2 import Environment
@@ -15,7 +18,7 @@ def _get_endpoint_payload():
 
 
 def read_sql(backend: str, sql: str, sql_params=None) -> str:
-    """Given a backend, sql and params, run the sql. """
+    """Given a backend, sql and params, run the sql."""
     payload = _get_endpoint_payload()
     route = payload['route'] + f'/view/{backend}'
 
@@ -30,3 +33,13 @@ def read_sql(backend: str, sql: str, sql_params=None) -> str:
     )
     response.raise_for_status()
     return pd.read_json(response.text)
+
+
+def list_backends():
+    """Retreive all backends registered."""
+    payload = _get_endpoint_payload()
+    route = payload['route'] + f'/backends'
+
+    response = requests.get(route, headers=payload['headers'])
+    response.raise_for_status()
+    return response.json()

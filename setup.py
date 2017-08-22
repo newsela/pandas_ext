@@ -1,3 +1,14 @@
+#! /usr/bin/env python
+"""Private package for interacting with pandas extension modules.
+
+This private package is used in the the following repos
+
+notebooks
+salesforce_processor
+
+Any additional repos that may require client-side libs to do
+data manipulation.
+"""
 import os
 from setuptools import find_packages, setup
 from pandas_ext import __version__

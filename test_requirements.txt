@@ -1,3 +1,8 @@
 -r requirements.txt
 flake8
 autopep8
+pydocstyle
+pytest
+pytest-cov
+pytest-xdist
+coverage

@@ -16,7 +16,7 @@ def _get_endpoint_payload():
 
 
 def read_sfdc(sql: str, sql_params=None) -> str:
-    """Given sql and params, run the sql. """
+    """Given sql and params, run the sql."""
     payload = _get_endpoint_payload()
     route = payload['route'] + '/sfdc/query/v20.0'
 
@@ -53,6 +53,7 @@ def sfdc_metadata(sobject: str, fetch_all=False) -> str:
 
 
 def patch_sfdc(sf_url, data):
+    """Sync patch sfdc."""
     payload = _get_endpoint_payload()
     route = payload['route'] + '/sfdc/patch/v20.0'
 
@@ -67,8 +68,9 @@ def patch_sfdc(sf_url, data):
 
 
 def async_patch_sfdc(data):
+    """Asynchronously patch sfdc."""
     payload = _get_endpoint_payload()
-    route = payload['route'] + '/sfdc/async_patch/v20.0'
+    route = payload['route'] + '/sfdc/patch/v20.0'
 
     params = [
         dict(sf_url=items['sf_url'], data=items['patch_data'])
@@ -76,7 +78,7 @@ def async_patch_sfdc(data):
     ]
     with ThreadPoolExecutor(max_workers=25) as executor:
         responses = executor.map(
-            requests.patch, (dict(
+            requests.patch, **(dict(
                 url=route,
                 headers=payload['headers'],
                 params=param,

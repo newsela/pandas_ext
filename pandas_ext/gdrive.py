@@ -1,4 +1,4 @@
-"""gdrive handlers for easy read/write to Gdrive"""
+"""gdrive handlers for easy read/write to Gdrive."""
 from collections import namedtuple
 from io import BytesIO
 from json import JSONDecodeError
@@ -42,6 +42,7 @@ def read_gdrive(url: str, raw=False, **kwargs) -> object:
     Returns:
         object: Returns dataframe if file mimetype in PANDAS_MIMETYPES
             else file-like object for further processing
+
     """
     payload = _get_endpoint_payload()
     route = payload['route'] + '/read'
@@ -52,6 +53,7 @@ def read_gdrive(url: str, raw=False, **kwargs) -> object:
         params=params,
         stream=True,
     )
+    print(response.headers['content-type'])
 
     mimetype = response.headers['content-type'].split(';')[0]
 
@@ -86,6 +88,7 @@ def to_gdrive(
 
     Returns:
         Google Drive alternate web link for preview.
+
     """
     payload = _get_endpoint_payload()
     route = payload['route'] + '/write'
@@ -117,6 +120,7 @@ def to_gdrive(
         files=ifile,
         data=data,
     )
+    print(response.headers['content-type'])
     remove(tmp_file)
     try:
         return response.json()
@@ -134,15 +138,19 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
 
     Returns:
         namedtuple if fetch_all is False else dictionary of all metadata
+
     """
     payload = _get_endpoint_payload()
     route = payload['route'] + '/metadata'
     params = dict(url=url)
+
     response = requests.get(
         route,
         headers=payload['headers'],
         params=params
     )
+
+    metadata = response.json()
 
     meta_fields = [
         'mimeType',
@@ -154,7 +162,6 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
         'alternateLink',
     ]
 
-    metadata = {metadata[0]: metadata[1] for metadata in response.json()}
     try:
         metadata['folder_id'] = (
             metadata['parents'][0]['id']
