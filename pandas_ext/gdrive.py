@@ -53,7 +53,6 @@ def read_gdrive(url: str, raw=False, **kwargs) -> object:
         params=params,
         stream=True,
     )
-    print(response.headers['content-type'])
 
     mimetype = response.headers['content-type'].split(';')[0]
 
@@ -120,7 +119,6 @@ def to_gdrive(
         files=ifile,
         data=data,
     )
-    print(response.headers['content-type'])
     remove(tmp_file)
     try:
         return response.json()

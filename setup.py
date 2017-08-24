@@ -13,6 +13,8 @@ import os
 from setuptools import find_packages, setup
 from pandas_ext import __version__
 
+GH_TOKEN = os.environ['GH_TOKEN']
+
 README = open(os.path.join(os.path.dirname(__file__), 'README.md'),
               'r', encoding="utf-8").read()
 
@@ -39,6 +41,10 @@ setup(
     tests_requires=test_required,
     long_description=README,
     packages=find_packages(exclude=('tests', 'docs')),
+    dependency_links=[
+        f'git+https://{GH_TOKEN}@github.com/namely/pandas_ext.git'
+        '@master#egg=pandas_ext-0'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.6',
