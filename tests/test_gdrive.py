@@ -39,5 +39,4 @@ def test_gdrive_writes(to_gdrive_params):
     with open(path.join(gettempdir(), file_name), 'w') as test_file:
         test_file.write(file_name)
     result = gdrive.to_gdrive(**to_gdrive_params)
-    print(result)
-    assert 1 == 0
+    assert result.endswith('edit?usp=drivesdk')

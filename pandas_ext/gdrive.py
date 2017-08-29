@@ -162,9 +162,8 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
 
     try:
         metadata['folder_id'] = (
-            metadata['parents'][0]['id']
-            if 'parents' in metadata
-            else None
+            None if 'parents' not in metadata
+            else metadata['parents'][0]['id']
         )
     except IndexError:
         raise('The file must reside in a folder that is shared with '
