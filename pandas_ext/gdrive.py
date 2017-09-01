@@ -148,8 +148,8 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
         params=params
     )
 
-    # metadata = response.json()
-    metadata = {meta[0]: meta[1] for meta in response.json()}
+    metadata = response.json()
+    #metadata = {meta[0]: meta[1] for meta in response.json()}
 
     meta_fields = [
         'mimeType',
