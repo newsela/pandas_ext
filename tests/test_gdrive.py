@@ -1,5 +1,5 @@
 # from collections import namedtuple
-from os import path
+from os import path, environ
 from tempfile import gettempdir
 
 import pytest
@@ -10,14 +10,14 @@ from pandas_ext import gdrive
 @pytest.fixture
 def url():
     """Valid test Url."""
-    return 'https://drive.google.com/open?id=0BysWz9wJTD4KOTVvWkVKY3E4QTQ'
+    return f"https://drive.google.com/open?id={environ['GDRIVE_TEST_ID']}"
 
 
 @pytest.fixture
 def to_gdrive_params():
     return dict(
         file_name='test - (1).csv',
-        folder_id='0B_HIHwXpt9XJMUJvUlJMM0hmTTA',
+        folder_id=environ['GDRIVE_TEST_FOLDER'],
         data=None,
         to_gapp=False
     )
