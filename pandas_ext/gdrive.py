@@ -59,10 +59,8 @@ def read_gdrive(url: str, raw=False, **kwargs) -> object:
     if mimetype in PANDAS_MIMETYPES and not raw:
         with BytesIO(response.content) as fh:
             return PANDAS_MIMETYPES[mimetype](fh, **kwargs)
-    elif mimetype in PANDAS_MIMETYPES and raw:
-        return BytesIO(response.content)
     else:
-        return open(BytesIO(response.content), 'rb')
+        return BytesIO(response.content)
 
 
 def to_gdrive(
