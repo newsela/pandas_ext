@@ -8,14 +8,14 @@ import os
 from setuptools import find_packages, setup
 from pandas_ext import __version__
 
-README = open(os.path.join(os.path.dirname(__file__), 'README.md'),
+README = open(os.path.join(os.path.dirname(__file__).replace('_','-'), 'README.md'),
               'r', encoding="utf-8").read()
 
-with open(os.path.join(os.path.dirname(__file__),
+with open(os.path.join(os.path.dirname(__file__).replace('_','-'),
                        'requirements.txt')) as f:
     required = f.read().splitlines()
 
-with open(os.path.join(os.path.dirname(__file__),
+with open(os.path.join(os.path.dirname(__file__).replace('_','-'),
                        'test_requirements.txt')) as f:
     test_required = f.read().splitlines()
 
