@@ -7,7 +7,8 @@ def read_json(
     path: str,
     dtype:Union[bool, Dict[str, str]]=True,
     lines: bool=True,
-    compression: str='infer'
+    compression: str='infer',
+    **kwargs
 ) -> pd.DataFrame:
     """Simplified read_json from pandas.
     
@@ -18,5 +19,6 @@ def read_json(
         path,
         dtype=dtype,
         lines=lines,
-        compression=compression
+        compression=compression,
+        **kwargs
     )
