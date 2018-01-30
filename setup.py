@@ -32,7 +32,7 @@ setup(
     version=__version__,
     license=license,
     install_requires=required,
-    tests_requires=test_required,
+    #tests_requires=test_required,
     long_description=README,
     packages=find_packages(exclude=('tests', 'docs')),
     classifiers=[
