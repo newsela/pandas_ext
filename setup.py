@@ -28,7 +28,7 @@ setup(
     author="Rich Fernandez, Sean Massot, Brian Tenazas",
     author_email="devs@newsela.com",
     url="https://github.com/newsela/pandas_ext",
-    download_url=f"https://github.com/newsela/pandas_ext/archive/{version}.tar.gz",
+    download_url=f"https://github.com/newsela/pandas_ext/archive/{__version__}.tar.gz",
     version=__version__,
     license=license,
     install_requires=required,
