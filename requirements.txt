@@ -1,3 +1,5 @@
 Jinja2
 pandas
+pyarrow
 requests
+s3fs

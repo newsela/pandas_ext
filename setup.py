@@ -1,10 +1,5 @@
 #! /usr/bin/env python
-"""Private package for interacting with pandas extension modules.
-
-This private package is used in the the following repos
-
-notebooks
-salesforce_processor
+"""Package for interacting with pandas extension modules.
 
 Any additional repos that may require client-side libs to do
 data manipulation.
@@ -31,8 +26,9 @@ setup(
     name="pandas_ext",
     description="Python Pandas extensions for pandas dataframes",
     author="Rich Fernandez, Sean Massot, Brian Tenazas",
-    author_email="dev@namely.com",
-    url="https://github.com/namely/pandas_ext",
+    author_email="devs@newsela.com",
+    url="https://github.com/newsela/pandas_ext",
+    download_url=f"https://github.com/newsela/pandas_ext/archive/{version}.tar.gz",
     version=__version__,
     license=license,
     install_requires=required,
@@ -44,5 +40,4 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 2.7',
     ],
-
 )
