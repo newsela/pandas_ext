@@ -53,14 +53,14 @@ def find_meta(meta):
 
 setup(
     name=NAME,
-    description=README,
+    description=read("description"),
     author=find_meta("author"),
     author_email=find_meta("email"),
     url=find_meta("uri"),
     version=find_meta("version"),
     license=find_meta("license"),
     install_requires=read("requirements.txt"),
-    long_description=read('README.md'),
+    long_description=README,
     packages=PACKAGES,
     classifiers=CLASSIFIERS,
 )
