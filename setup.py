@@ -4,40 +4,60 @@
 Any additional repos that may require client-side libs to do
 data manipulation.
 """
+import codecs 
 import os
+import re
+
 from setuptools import find_packages, setup
-from pandas_ext import __version__
 
-README = open(os.path.join(os.path.dirname(__file__).replace('_','-'), 'README.md'),
-              'r', encoding="utf-8").read()
+###############################################################
+NAME = "pandas_ext"
+PACKAGES = find_packages(where="pandas_ext", exclude=('tests', 'docs')),
+META_PATH = os.path.join("pandas_ext", "__init__.py")
+CLASSIFIERS = [
+    'Development Status :: 3 - Alpha',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 2.7',
+]
+##############################################################
 
-with open(os.path.join(os.path.dirname(__file__).replace('_','-'),
-                       'requirements.txt')) as f:
-    required = f.read().splitlines()
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(os.path.dirname(__file__).replace('_','-'),
-                       'test_requirements.txt')) as f:
-    test_required = f.read().splitlines()
 
-with open('LICENSE') as f:
-    license = f.read()
+def read(*parts):
+    """
+    Build an absolute path from *parts* and and return the contents of the
+    resulting file.  Assume UTF-8 encoding.
+    """
+    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
+        return f.read()
+
+META_FILE = read(META_PATH)
+
+
+def find_meta(meta):
+    """
+    Extract __*meta*__ from META_FILE.
+    """
+
+    meta_match = re.search(
+        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
+        META_FILE, re.M
+    )
+    if meta_match:
+        return meta_match.group(1)
+    raise RuntimeError(f"Unable to find __{meta}__ string.")
 
 setup(
-    name="pandas_ext",
-    description="Python Pandas extensions for pandas dataframes",
-    author="Rich Fernandez, Sean Massot, Brian Tenazas",
-    author_email="devs@newsela.com",
-    url="https://github.com/newsela/pandas_ext",
-    download_url=f"https://github.com/newsela/pandas_ext/archive/{__version__}.tar.gz",
-    version=__version__,
-    license=license,
-    install_requires=required,
-    #tests_requires=test_required,
-    long_description=README,
-    packages=find_packages(exclude=('tests', 'docs')),
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 2.7',
-    ],
+    name=NAME,
+    description=find_meta("description"),
+    author=find_meta("author"),
+    author_email=find_meta("email"),
+    url=find_meta("uri")
+    version=find_meta("version"),
+    license=find_meta("license"),
+    install_requires=read("requirements.txt"),
+    long_description=read('README.md'),
+    packages=PACKAGES,
+    classifiers=CLASSIFIERS,
 )
