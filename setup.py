@@ -53,7 +53,7 @@ def find_meta(meta):
 
 setup(
     name=NAME,
-    description=read("description"),
+    description=find_meta("description"),
     author=find_meta("author"),
     author_email=find_meta("email"),
     url=find_meta("uri"),
