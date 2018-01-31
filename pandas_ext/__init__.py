@@ -1,5 +1,5 @@
 """Versioning kept here."""
-__version__ = '0.3.4'
+__version__ = '0.3.5'
 __license__ = "MIT"
 
 __title__ = "pandas_ext"
