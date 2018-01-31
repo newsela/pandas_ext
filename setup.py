@@ -4,15 +4,17 @@
 Any additional repos that may require client-side libs to do
 data manipulation.
 """
+from pypandoc import convert
+from setuptools import find_packages, setup
+
 import codecs 
 import os
 import re
 
-from setuptools import find_packages, setup
 
 ###############################################################
 NAME = "pandas_ext"
-PACKAGES = find_packages(where="pandas_ext", exclude=('tests', 'docs')),
+PACKAGES = find_packages(exclude=('tests', 'docs'))
 META_PATH = os.path.join("pandas_ext", "__init__.py")
 CLASSIFIERS = [
     'Development Status :: 3 - Alpha',
@@ -32,6 +34,7 @@ def read(*parts):
     with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
         return f.read()
 
+README = convert('README.md', 'rst')
 META_FILE = read(META_PATH)
 
 
@@ -50,10 +53,10 @@ def find_meta(meta):
 
 setup(
     name=NAME,
-    description=find_meta("description"),
+    description=README,
     author=find_meta("author"),
     author_email=find_meta("email"),
-    url=find_meta("uri")
+    url=find_meta("uri"),
     version=find_meta("version"),
     license=find_meta("license"),
     install_requires=read("requirements.txt"),
