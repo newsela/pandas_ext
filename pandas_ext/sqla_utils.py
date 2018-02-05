@@ -66,7 +66,7 @@ def dtype_to_spectrum(dtype):
 def schema_from_df(df: pd.DataFrame, db_type: Db_type='redshift_spectrum'):
     dtype_map = df.dtypes.to_dict()
     return ',\n'.join(
-            [f'`{col}` {dtype_to_spectrum(dtype)}'
+            [f'"{col}" {dtype_to_spectrum(dtype)}'
                 for col, dtype in dtype_map.items()
             ]
     )
