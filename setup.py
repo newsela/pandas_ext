@@ -14,7 +14,7 @@ import re
 
 ###############################################################
 NAME = "pandas_ext"
-PACKAGES = find_packages(exclude=('tests', 'docs'))
+PACKAGES = ['pandas_ext']
 META_PATH = os.path.join("pandas_ext", "__init__.py")
 CLASSIFIERS = [
     'Development Status :: 3 - Alpha',
