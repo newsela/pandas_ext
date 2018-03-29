@@ -15,7 +15,7 @@ from .csv import to_csv
 from .gdrive import read_gdrive, to_gdrive
 from .parquet import read_parquet, to_parquet
 from .sfdc import (
-    read_sfdc, sfdc_metadata, patch_sfdc, async_patch,
+    read_sfdc, sfdc_metadata, patch_sfdc, async_patch_sfdc,
 )
 from .sql import read_sql, list_backends
 
