@@ -19,7 +19,7 @@ px.to_parquet
 px.read_sfdc
 px.sfdc_metadata
 px.patch_sfdc
-px.async_patch
+px.async_patch_sfdc
 
 px.read_sql
 px.list_backends
