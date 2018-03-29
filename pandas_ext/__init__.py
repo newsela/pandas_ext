@@ -9,3 +9,23 @@ __author__ = "Rich Fernandez, Sean Massot, Brian Tenazas"
 __email__ = "devs@newsela.com"
 
 __uri__ = "https://github.com/newsela/pandas_ext"
+
+import pandas as _pd
+from .csv import to_csv
+from .gdrive import read_gdrive, to_gdrive
+from .parquet import read_parquet, to_parquet
+from .sfdc import (
+    read_sfdc, sfdc_metadata, patch_sfdc, async_patch_sfdc,
+)
+from .sql import read_sql, list_backends
+
+read_csv = _pd.read_csv
+
+# Don't pollute the namespace with the module names:
+del common
+del csv
+del gdrive
+del parquet
+del sfdc
+del sql
+del _pd
