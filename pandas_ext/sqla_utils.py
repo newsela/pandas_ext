@@ -48,10 +48,6 @@ import pandas as pd
 from pandas.api.types import pandas_dtype
 import numpy as np
 
-from enum import Enum, auto
-
-class Db_type(Enum):
-    redshift = auto()
 
 def dtype_to_spectrum(dtype):
     """convert pandas dtype to equivalent redshift spectrum schema column value."""
@@ -63,7 +59,7 @@ def dtype_to_spectrum(dtype):
         pandas_dtype(np.datetime64): 'TIMESTAMP',
     }[dtype]
 
-def schema_from_df(df: pd.DataFrame, db_type: Db_type='redshift_spectrum'):
+def schema_from_df(df: pd.DataFrame):
     dtype_map = df.dtypes.to_dict()
     return ',\n'.join(
             [f'"{col}" {dtype_to_spectrum(dtype)}'
