@@ -3,4 +3,4 @@ pandas
 pyarrow
 requests
 s3fs
-python-dateutil
+python-dateutil<2.7.0,>=2.6.1
