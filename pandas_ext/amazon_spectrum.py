@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from inspect import cleandoc
 
 import pandas as pd
