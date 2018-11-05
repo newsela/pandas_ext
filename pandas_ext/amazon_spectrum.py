@@ -1,3 +1,4 @@
+from inspect import cleandoc
 import pandas as pd
 from pandas.io.sql import execute
 
@@ -21,8 +22,8 @@ def _build_s3_stream_path(
 ):
     time_now = now()
     return (f's3://{bucket}/{stream}/ext={file_format}/'
-            f'{partition}={partition_value}/{stream}_{time_now}'
-    ).lower()
+            f'{partition}={partition_value}/{stream}_{time_now}.snappy'
+            ).lower()
 
 
 def _create_schema_alias_statement(
@@ -30,11 +31,12 @@ def _create_schema_alias_statement(
     schema: str,
     table: str
 ) -> str:
-    return (
-        f'CREATE VIEW "{schema_alias}"."{table}" AS\n'
-        f'SELECT * FROM "{schema}"."{table}"\n'
-        'WITH NO SCHEMA BINDING\n;\n'
-    )
+    return cleandoc(f"""
+        CREATE VIEW "{schema_alias}"."{table}" AS
+        SELECT * FROM "{schema}"."{table}"
+        WITH NO SCHEMA BINDING;
+    """
+                    )
 
 
 def _create_partition_statement(
@@ -50,12 +52,25 @@ def _create_partition_statement(
         today()
     )
     s3_path = f's3://{bucket}/{stream}/ext={file_format}/{partition}={partition_value}/'.lower()
-    return (
-        f'ALTER TABLE {schema}.{stream}_{file_format}\n'
-        f"ADD PARTITION ({partition}='{partition_value}')\n"
-        f"LOCATION '{s3_path}'\n"
-        ';\n'
-    )
+    return cleandoc(f"""
+        ALTER TABLE "{schema}"."{stream}_{file_format}"
+        ADD PARTITION ({partition}='{partition_value}')
+        LOCATION '{s3_path}'
+        ;"""
+                    )
+
+
+def _external_table_exists_statement(
+    schema: str,
+    table: str
+) -> str:
+
+    return cleandoc(f"""
+        SELECT distinct(schemaname || tablename) as schema_table
+        FROM SVV_EXTERNAL_COLUMNS
+        WHERE schemaname || tablename = '{schema}{table}'
+        ;"""
+                    )
 
 
 def _create_external_table_statement(
@@ -73,15 +88,15 @@ def _create_external_table_statement(
     upper_file_format = file_format.upper()
     s3_path = f's3://{bucket}/{stream}/ext={file_format}/'.lower()
 
-    return (
-        f'CREATE EXTERNAL TABLE "{schema}"."{table}" (\n'
-        f'{columns}\n'
-        f')\nPARTITIONED BY ({partition} {partition_type})\n'
-        f'ROW FORMAT SERDE {serde}\n'
-        f'STORED AS {upper_file_format}\n'
-        f"LOCATION '{s3_path}'\n"
-        ';\n'
-    )
+    return cleandoc(f"""
+        CREATE EXTERNAL TABLE "{schema}"."{table}_{file_format}" (
+        {columns}
+        )PARTITIONED BY ({partition} {partition_type})
+        ROW FORMAT SERDE '{serde}'
+        STORED AS {upper_file_format}
+        LOCATION '{s3_path}'
+        ;"""
+                    )
 
 
 def to_spectrum(
@@ -133,6 +148,7 @@ def to_spectrum(
         '' if not schema_alias else
         _create_alias_statement(schema_alias, schema, table)
     )
+
     partition_value = (
         partition_value if partition_value else
         today()
@@ -144,6 +160,7 @@ def to_spectrum(
         partition=partition,
         partition_value=partition_value
     )
+
     create_statement = (''.join([
         external_table_statement,
         alias_statement,
@@ -151,10 +168,22 @@ def to_spectrum(
     ]))
     print(create_statement)
 
-    s3_path = _build_s3_stream_path(bucket, stream, file_format, partition, partition_value)
-    to_parquet(df, s3_path, **kwargs)
+    s3_path = _build_s3_stream_path(
+        bucket,
+        stream,
+        file_format,
+        partition,
+        partition_value)
     print(f'SELECT COUNT(*) FROM "{schema}"."{table}";')
     print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
-        execute(create_statement, conn)
+        print(s3_path)
+        to_parquet(df, s3_path, **kwargs)
+        schema_table_statement = _external_table_exists_statement(
+            schema, table)
+        table_exists_data = pd.read_sql_query(schema_table_statement, conn)
+        if not len(table_exists_data):
+            # table doesn't exist so create it.
+            execute(create_statement, conn)
+        execute(partition_statement, conn)
