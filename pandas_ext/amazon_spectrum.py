@@ -1,4 +1,6 @@
+<<<<<<< HEAD
 from inspect import cleandoc
+
 import pandas as pd
 from pandas.io.sql import execute
 
@@ -148,7 +150,6 @@ def to_spectrum(
         '' if not schema_alias else
         _create_alias_statement(schema_alias, schema, table)
     )
-
     partition_value = (
         partition_value if partition_value else
         today()
@@ -160,7 +161,6 @@ def to_spectrum(
         partition=partition,
         partition_value=partition_value
     )
-
     create_statement = (''.join([
         external_table_statement,
         alias_statement,
