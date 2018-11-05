@@ -18,7 +18,7 @@ def test():
     df = pd.DataFrame(data)
     
     assert sqla_utils.schema_from_df(df) == (
-        '`one` FLOAT8,\n'
-        '`two` VARCHAR(max),\n'
-        '`three` BOOL'
+        '"one" FLOAT8,\n'
+        '"two" VARCHAR(max),\n'
+        '"three" BOOL'
     )

@@ -16,6 +16,8 @@ px.to_gdrive
 px.read_parquet
 px.to_parquet
 
+px.to_spectrum
+
 px.read_sfdc
 px.sfdc_metadata
 px.patch_sfdc
