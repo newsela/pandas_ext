@@ -1,9 +1,8 @@
 from inspect import cleandoc
 
 import pandas as pd
-from pandas.io.sql import execute
 
-from pandas_ext.common.utils import today, now
+from pandas_ext.common.utils import today
 from pandas_ext.parquet import to_parquet
 from pandas_ext.sqla_utils import schema_from_df
 
@@ -21,9 +20,8 @@ def _build_s3_stream_path(
     partition,
     partition_value
 ):
-    time_now = now()
     return (f's3://{bucket}/{stream}/ext={file_format}/'
-            f'{partition}={partition_value}/{stream}_{time_now}.snappy'
+            f'{partition}={partition_value}/{stream}.snappy'
             ).lower()
 
 
@@ -173,16 +171,19 @@ def to_spectrum(
         file_format,
         partition,
         partition_value)
-    print(f'SELECT COUNT(*) FROM "{schema}"."{table}";')
+    print(f'SELECT COUNT(*) FROM "{schema}"."{table}_{file_format}";')
     print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
         print(s3_path)
         to_parquet(df, s3_path, **kwargs)
+        from sqlalchemy import create_engine
+        engine = create_engine(conn, execution_options=dict(autocommit=True))
+
         schema_table_statement = _external_table_exists_statement(
             schema, table)
         table_exists_data = pd.read_sql_query(schema_table_statement, conn)
         if not len(table_exists_data):
             # table doesn't exist so create it.
-            execute(create_statement, conn)
-        execute(partition_statement, conn)
+            engine.execute(create_statement)
+        engine.execute(partition_statement)

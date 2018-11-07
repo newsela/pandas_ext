@@ -51,13 +51,18 @@ import numpy as np
 
 def dtype_to_spectrum(dtype):
     """convert pandas dtype to equivalent redshift spectrum schema column value."""
-    return {
-        pandas_dtype(np.float64): 'FLOAT8',
-        pandas_dtype(np.object): 'VARCHAR(max)',
-        pandas_dtype(np.int64): 'INT8',
-        pandas_dtype(np.bool): 'BOOL',
-        pandas_dtype(np.datetime64): 'TIMESTAMP',
-    }[dtype]
+    try:
+        return {
+            pandas_dtype(np.float64): 'FLOAT8',
+            pandas_dtype(np.object): 'VARCHAR(8192)',
+            pandas_dtype(np.int64): 'INT8',
+            pandas_dtype(np.bool): 'BOOL',
+            pandas_dtype(np.datetime64): 'TIMESTAMP',
+            pandas_dtype('<M8[s]'): 'TIMESTAMP'
+        }[dtype]
+    except KeyError:
+        return 'TEXT'
+
 
 def schema_from_df(df: pd.DataFrame):
     dtype_map = df.dtypes.to_dict()
