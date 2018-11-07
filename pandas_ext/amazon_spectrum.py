@@ -100,8 +100,8 @@ def _create_external_table_statement(
 
 def to_spectrum(
     df: pd.DataFrame,
-    schema: str,
     table: str,
+    schema: str,
     bucket: str,
     schema_alias: str='',
     stream: str='',
