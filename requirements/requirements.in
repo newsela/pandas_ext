@@ -1,0 +1,7 @@
+Jinja2
+pandas
+pyarrow
+pypandoc
+requests
+s3fs
+python-dateutil<2.7.0,>=2.6.1
