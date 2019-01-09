@@ -7,7 +7,7 @@ data manipulation.
 from pypandoc import convert
 from setuptools import find_packages, setup
 
-import codecs 
+import codecs
 import os
 import re
 
@@ -34,6 +34,7 @@ def read(*parts):
     with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
         return f.read()
 
+
 README = convert('README.md', 'rst')
 META_FILE = read(META_PATH)
 
@@ -51,6 +52,7 @@ def find_meta(meta):
         return meta_match.group(1)
     raise RuntimeError(f"Unable to find __{meta}__ string.")
 
+
 setup(
     name=NAME,
     description=find_meta("description"),
@@ -59,7 +61,7 @@ setup(
     url=find_meta("uri"),
     version=find_meta("version"),
     license=find_meta("license"),
-    install_requires=read("requirements.txt"),
+    install_requires=read("requirements/requirements.in"),
     long_description=README,
     packages=PACKAGES,
     classifiers=CLASSIFIERS,
