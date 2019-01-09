@@ -59,7 +59,7 @@ setup(
     url=find_meta("uri"),
     version=find_meta("version"),
     license=find_meta("license"),
-    install_requires=read("requirements.txt"),
+    install_requires=read("requirements/requirements.in"),
     long_description=README,
     packages=PACKAGES,
     classifiers=CLASSIFIERS,

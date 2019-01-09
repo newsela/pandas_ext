@@ -1,7 +1,7 @@
-Jinja2
-pandas
-pyarrow
-pypandoc
-requests
-s3fs
+Jinja2>=2.10
+pandas>=0.23.4
+pyarrow>=0.11.1
+pypandoc>=1.4
+requests>=2.20.0
+s3fs>=0.1.6
 python-dateutil<2.7.0,>=2.6.1
