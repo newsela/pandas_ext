@@ -4,7 +4,6 @@
 Any additional repos that may require client-side libs to do
 data manipulation.
 """
-from pypandoc import convert
 from setuptools import find_packages, setup
 
 import codecs
@@ -35,7 +34,7 @@ def read(*parts):
         return f.read()
 
 
-README = convert('README.md', 'rst')
+README = read('README.md')
 META_FILE = read(META_PATH)
 
 
@@ -45,8 +44,7 @@ def find_meta(meta):
     """
 
     meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
+        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta), META_FILE, re.M
     )
     if meta_match:
         return meta_match.group(1)
