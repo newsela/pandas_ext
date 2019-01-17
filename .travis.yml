@@ -4,6 +4,7 @@ python:
 install:
   - pip install -r requirements-test.txt
 script:
+  - coverage xml
   - python-codacy-coverage -r coverage.xml
 deploy:
   provider: pypi
