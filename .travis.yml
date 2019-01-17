@@ -1,7 +1,10 @@
 language: python
-python:
-- '3.6'
-script: echo "skipping build"  # TEMP
+python: 
+  - "3.6"
+install:
+  - pip install -r requirements-test.txt
+script:
+  - python-codacy-coverage -r coverage.xml
 deploy:
   provider: pypi
   user: lukeorland
@@ -9,3 +12,6 @@ deploy:
     tags: true
   password:
     secure: jlLQDe/zfwJNDwnVbX11wDYNYOVYpXbu9p7hvBef6zIeCPHz5j1N0clqLSTtYZhWgb1NjQPZREimlQRmqpsWBZbZwYv8yuI0P+jCZQ8Y5daxWguGNSzpLrR8kboG0+iqDccO2U0IhVHZJ4jM1+sm1yH0dc1VthGotLDtv9Axwm9uC3hhqz94OY+xIRcyEqxl86GSodc5yj0hKt+H/HDqP7xZ7mYcjvExu4ZUkkOk7S9S+UUzFXI3KyjSgk0qXnVqdZD/MkJL58Id0WSYIgfXWlPdxpFgFNDZTBENAhAz/MQ6IFe4+N0fe9cUr4hfrcaOWPssRKBXIpFA1KOSbDzR0sEXG0gCiU5iKiI42UesgYsTXklGA54Jg1/+IcOkX7CyX/GM73QbVqdCwyDzs/5hWUrMF3IgjedVTpXCd4XeQxzT2w7tT6v+npyjMGRx+9u5ZYSYqTc13Zfa7TxfKyiIpmmhQHif3i7ooNh/+FmQOSx3aT2xgymuCOp0YOH/7QYnEuR7q4MqY/ne/LZ+fWXTZcY4+oM9Lw7C3ZSvIY6mCbCpHgPP2I7B4IL55uUaCtbDGDtWnYDGhASyoL1Z71dvLvP7B6MS0rjpGl6+Df0QmQDUD2ebC8FRZhz3241DR2KU4AY0lDM9KOdB7CCO3AXI3+JkBBsPfA4Cb3O58k1Y54Q=
+env:
+  matrix:
+    secure: cFLEVrCd1SFsg01Nmj59b5zcSXKVZvTxv61DreADKGNeTXW5rbc7S2zxVPTpI4oJDQBFzZfeNq9dN5+pt2+kI9RM6Ckj/JVK/bqpmRkeEsitLoOMvfR+EsdtQVGH9kRBEUa0C3uCh4zCGnJ92Et8PnIJ6ctsXMLEynhT6yAsULRPES1o9gI/Fozmt/qSgv9MUh8kck0/a5ERl5N2F5EEe1GJZxHrqvchF9QM7aDjoDIOqHkpJ6PsJGMVKV4POPXoYG83qKOElfjmfXs/uGa5yOGcIQfnPGRzvZDK91zLIHZVC9UCNzHMe31uEYLAN7GXEyHcJeTkY8AFK0dVR3SBqbwbKF1XP2tYefoDy30AdmIbworBff+P4IdiKVRGBg/wfK9Ztvf20H9zx3fZXkg3HZv/5Vmj4Zff5F4NTVc3oggt0U5rYxyxtpBMxj3OoeyQYUwoCkY/nwZbSOcm38z2vm19uqH6EKb8l5HQlE0pIkJyAlGWR0XVnuwoqscryZbkXrONT26K9qPx+J8LbBozMqCnhGtO4/bQv4z8H5y9MuI3TOO1Fu6CciNX30Gc6pqK+9PKiCvjfH0N+j02Tkdd/Fb0LngB3rSuYZAeAZAMAEUfwVNxpLN9ygg2q1hovouZU//QsdsKHsZ/ExOQTq3ghO1/0w95MiY8sGJaTLnm2eA=
