@@ -110,6 +110,7 @@ def to_spectrum(
     partition_type: str='date',
     partition_value: str='',
     conn: str='',
+    verbose: bool=True,
     **kwargs
 ) -> str:
     """Sends your dataframe to Spectrum for use in Athena/Redshift/Looker/etc
@@ -118,8 +119,8 @@ def to_spectrum(
        external schema can actually run the CREATE EXTERNAL TABLE statement.
 
        df: pandas Dataframe
-       schema: external table schema
        table: table name as it appears in Spectrum
+       schema: external table schema
        bucket: s3 bucket
        schema_alias: If you want to create an alternate path to your schema
        stream: Defaults to table if not provided.
@@ -171,11 +172,11 @@ def to_spectrum(
         file_format,
         partition,
         partition_value)
-    print(f'SELECT COUNT(*) FROM "{schema}"."{table}_{file_format}";')
-    print(f"df_{table} = read_parquet('{s3_path}')")
+    if verbose:
+        print(f'SELECT COUNT(*) FROM "{schema}"."{table}_{file_format}";')
+        print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
-        print(s3_path)
         to_parquet(df, s3_path, **kwargs)
         from sqlalchemy import create_engine
         engine = create_engine(conn, execution_options=dict(autocommit=True))
@@ -187,3 +188,4 @@ def to_spectrum(
             # table doesn't exist so create it.
             engine.execute(create_statement)
         engine.execute(partition_statement)
+    return create_statement
