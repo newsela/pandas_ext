@@ -19,6 +19,6 @@ def test():
     
     assert sqla_utils.schema_from_df(df) == (
         '"one" FLOAT8,\n'
-        '"two" VARCHAR(max),\n'
+        '"two" VARCHAR(8192),\n'
         '"three" BOOL'
     )

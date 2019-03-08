@@ -1,3 +1,4 @@
+"""Tools for creating Amazon Spectrum schemas."""
 from inspect import cleandoc
 
 import pandas as pd
@@ -18,17 +19,24 @@ def _build_s3_stream_path(
     stream,
     file_format,
     partition,
-    partition_value
+    partition_value,
+    has_partition
 ):
-    return (f's3://{bucket}/{stream}/ext={file_format}/'
-            f'{partition}={partition_value}/{stream}.snappy'
-            ).lower()
+    partitioned_by = (
+        f'{partition}={partition_value}'
+        if has_partition
+        else ''
+    )
+    return cleandoc(f"""
+        s3://{bucket}/{stream}/ext={file_format}/{partitioned_by}{stream}
+        /{stream}.snappy"""
+                    ).lower()
 
 
 def _create_schema_alias_statement(
-    schema_alias: str,
-    schema: str,
-    table: str
+        schema_alias: str,
+        schema: str,
+        table: str
 ) -> str:
     return cleandoc(f"""
         CREATE VIEW "{schema_alias}"."{table}" AS
@@ -39,18 +47,21 @@ def _create_schema_alias_statement(
 
 
 def _create_partition_statement(
-    schema: str,
-    bucket: str,
-    stream: str,
-    file_format: str='parquet',
-    partition: str='dt',
-    partition_value: str=''
+        schema: str,
+        bucket: str,
+        stream: str,
+        file_format: str= 'parquet',
+        partition: str= 'dt',
+        partition_value: str= ''
 ) -> str:
     partition_value = (
         partition_value if partition_value else
         today()
     )
-    s3_path = f's3://{bucket}/{stream}/ext={file_format}/{partition}={partition_value}/'.lower()
+    s3_path = (
+        f's3://{bucket}/{stream}/ext={file_format}/'
+        f'{partition}={partition_value}/'
+    ).lower()
     return cleandoc(f"""
         ALTER TABLE "{schema}"."{stream}_{file_format}"
         ADD PARTITION ({partition}='{partition_value}')
@@ -60,8 +71,8 @@ def _create_partition_statement(
 
 
 def _external_table_exists_statement(
-    schema: str,
-    table: str
+        schema: str,
+        table: str
 ) -> str:
 
     return cleandoc(f"""
@@ -73,24 +84,31 @@ def _external_table_exists_statement(
 
 
 def _create_external_table_statement(
-    schema: str,
-    table: str,
-    columns: str,
-    bucket: str,
-    stream: str,
-    file_format: str='parquet',
-    partition: str='dt',
-    partition_type: str='date',
-    partition_value: str=''
+        schema: str,
+        table: str,
+        columns: str,
+        bucket: str,
+        stream: str,
+        file_format: str = 'parquet',
+        partition: str = 'dt',
+        partition_type: str = 'date',
+        partition_value: str = '',
+        has_partition: bool = True
 ) -> str:
     serde = _get_file_format_serde(file_format)
     upper_file_format = file_format.upper()
     s3_path = f's3://{bucket}/{stream}/ext={file_format}/'.lower()
+    partitioned_by = (
+        f'PARTITIONED BY ({partition} {partition_type})'
+        if has_partition
+        else ''
+    )
 
     return cleandoc(f"""
         CREATE EXTERNAL TABLE "{schema}"."{table}_{file_format}" (
         {columns}
-        )PARTITIONED BY ({partition} {partition_type})
+        )
+        {partitioned_by}
         ROW FORMAT SERDE '{serde}'
         STORED AS {upper_file_format}
         LOCATION '{s3_path}'
@@ -99,19 +117,20 @@ def _create_external_table_statement(
 
 
 def to_spectrum(
-    df: pd.DataFrame,
-    table: str,
-    schema: str,
-    bucket: str,
-    schema_alias: str='',
-    stream: str='',
-    file_format: str='parquet',
-    partition: str='dt',
-    partition_type: str='date',
-    partition_value: str='',
-    conn: str='',
-    verbose: bool=True,
-    **kwargs
+        df: pd.DataFrame,
+        table: str,
+        schema: str,
+        bucket: str,
+        schema_alias: str = '',
+        stream: str = '',
+        file_format: str = 'parquet',
+        partition: str = 'dt',
+        partition_type: str = 'date',
+        partition_value: str = '',
+        conn: str = '',
+        verbose: bool = True,
+        has_partition: bool = True,
+        **kwargs
 ) -> str:
     """Sends your dataframe to Spectrum for use in Athena/Redshift/Looker/etc
 
@@ -130,6 +149,8 @@ def to_spectrum(
        partition_value: Defaults to todays date.
        conn: A valid sqlalchemy string to connect to spectrum.
        kwargs: kwargs you want to pass to `to_parquet()` call
+       verbose: prints additional output to console
+       has_partition: Remove partition altogether from output
     """
 
     columns = schema_from_df(df)
@@ -142,23 +163,27 @@ def to_spectrum(
         stream=stream,
         file_format=file_format,
         partition=partition,
-        partition_type=partition_type
+        partition_type=partition_type,
+        has_partition=has_partition
     )
     alias_statement = (
         '' if not schema_alias else
-        _create_alias_statement(schema_alias, schema, table)
+        _create_schema_alias_statement(schema_alias, schema, table)
     )
-    partition_value = (
-        partition_value if partition_value else
-        today()
-    )
-    partition_statement = _create_partition_statement(
-        schema=schema,
-        bucket=bucket,
-        stream=stream,
-        partition=partition,
-        partition_value=partition_value
-    )
+    if has_partition:
+        partition_value = (
+            partition_value if partition_value else
+            today()
+        )
+        partition_statement = _create_partition_statement(
+            schema=schema,
+            bucket=bucket,
+            stream=stream,
+            partition=partition,
+            partition_value=partition_value
+        )
+    else:
+        partition_statement = ''
     create_statement = (''.join([
         external_table_statement,
         alias_statement,
@@ -171,20 +196,21 @@ def to_spectrum(
         stream,
         file_format,
         partition,
-        partition_value)
+        partition_value,
+        has_partition
+    )
     if verbose:
         print(f'SELECT COUNT(*) FROM "{schema}"."{table}_{file_format}";')
         print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
-        to_parquet(df, s3_path, **kwargs)
         from sqlalchemy import create_engine
         engine = create_engine(conn, execution_options=dict(autocommit=True))
 
         schema_table_statement = _external_table_exists_statement(
             schema, table)
         table_exists_data = pd.read_sql_query(schema_table_statement, conn)
-        if not len(table_exists_data):
+        if len(table_exists_data) == 0:
             # table doesn't exist so create it.
             engine.execute(create_statement)
         engine.execute(partition_statement)
