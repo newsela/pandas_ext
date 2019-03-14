@@ -1,11 +1,13 @@
 """Tools for creating Amazon Spectrum schemas."""
 from inspect import cleandoc
+from os import getenv
 
 import pandas as pd
+import requests
 
 from pandas_ext.common.utils import today
 from pandas_ext.parquet import to_parquet
-from pandas_ext.sqla_utils import schema_from_df
+from pandas_ext.sqla_utils import schema_from_df, schema_from_registry
 
 
 def _get_file_format_serde(file_format: str) -> str:
@@ -117,10 +119,10 @@ def _create_external_table_statement(
 
 
 def to_spectrum(
-        df: pd.DataFrame,
         table: str,
-        schema: str,
+        external_schema: str,
         bucket: str,
+        df: pd.DataFrame = pd.DataFrame(),
         schema_alias: str = '',
         stream: str = '',
         file_format: str = 'parquet',
@@ -128,7 +130,6 @@ def to_spectrum(
         partition_type: str = 'date',
         partition_value: str = '',
         conn: str = '',
-        verbose: bool = True,
         has_partition: bool = True,
         **kwargs
 ) -> str:
@@ -137,10 +138,10 @@ def to_spectrum(
        Currently we only print out the statements as only the owner of the
        external schema can actually run the CREATE EXTERNAL TABLE statement.
 
-       df: pandas Dataframe
        table: table name as it appears in Spectrum
-       schema: external table schema
+       external_schema: external table schema
        bucket: s3 bucket
+       df: pandas Dataframe
        schema_alias: If you want to create an alternate path to your schema
        stream: Defaults to table if not provided.
        file_format: Defaults to parquet and may expand to avro.
@@ -149,14 +150,17 @@ def to_spectrum(
        partition_value: Defaults to todays date.
        conn: A valid sqlalchemy string to connect to spectrum.
        kwargs: kwargs you want to pass to `to_parquet()` call
-       verbose: prints additional output to console
        has_partition: Remove partition altogether from output
     """
 
-    columns = schema_from_df(df)
     stream = stream if stream else table
+    columns = (
+            schema_from_df(df)
+            if len(df) != 0 else
+            schema_from_registry(stream)
+        )
     external_table_statement = _create_external_table_statement(
-        schema=schema,
+        schema=external_schema,
         table=table,
         columns=columns,
         bucket=bucket,
@@ -168,7 +172,7 @@ def to_spectrum(
     )
     alias_statement = (
         '' if not schema_alias else
-        _create_schema_alias_statement(schema_alias, schema, table)
+        _create_schema_alias_statement(schema_alias, external_schema, table)
     )
     if has_partition:
         partition_value = (
@@ -176,7 +180,7 @@ def to_spectrum(
             today()
         )
         partition_statement = _create_partition_statement(
-            schema=schema,
+            schema=external_schema,
             bucket=bucket,
             stream=stream,
             partition=partition,
@@ -189,26 +193,13 @@ def to_spectrum(
         alias_statement,
         partition_statement
     ]))
-    print(create_statement)
-
-    s3_path = _build_s3_stream_path(
-        bucket,
-        stream,
-        file_format,
-        partition,
-        partition_value,
-        has_partition
-    )
-    if verbose:
-        print(f'SELECT COUNT(*) FROM "{schema}"."{table}_{file_format}";')
-        print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
         from sqlalchemy import create_engine
         engine = create_engine(conn, execution_options=dict(autocommit=True))
 
         schema_table_statement = _external_table_exists_statement(
-            schema, table)
+            external_schema, table)
         table_exists_data = pd.read_sql_query(schema_table_statement, conn)
         if len(table_exists_data) == 0:
             # table doesn't exist so create it.

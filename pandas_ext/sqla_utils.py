@@ -39,18 +39,23 @@ REAL    FLOAT4  Single precision floating-point number
 DOUBLE PRECISION    FLOAT8, FLOAT   Double precision floating-point number
 BOOLEAN     BOOL    Logical Boolean (true/false)
 CHAR    CHARACTER, NCHAR, BPCHAR    Fixed-length character string
-VARCHAR     CHARACTER VARYING, NVARCHAR, TEXT   Variable-length character string with a user-defined limit
+VARCHAR     CHARACTER VARYING, NVARCHAR, TEXT   Variable-length character string
+with a user-defined limit
 DATE        Calendar date (year, month, day)
 TIMESTAMP   TIMESTAMP WITHOUT TIME ZONE     Date and time (without time zone)
-TIMESTAMPTZ     TIMESTAMP WITH TIME ZONE    Date and time (with time zone) 
+TIMESTAMPTZ     TIMESTAMP WITH TIME ZONE    Date and time (with time zone)
 """
-import pandas as pd
-from pandas.api.types import pandas_dtype
+from os import getenv
+
 import numpy as np
+import pandas as pd
+import requests
+
+from pandas.api.types import pandas_dtype
 
 
 def dtype_to_spectrum(dtype):
-    """convert pandas dtype to equivalent redshift spectrum schema column value."""
+    """convert pandas dtype to equivalent redshift spectrum schema column."""
     try:
         return {
             pandas_dtype(np.float64): 'FLOAT8',
@@ -64,10 +69,29 @@ def dtype_to_spectrum(dtype):
         return 'TEXT'
 
 
-def schema_from_df(df: pd.DataFrame):
+def schema_from_df(df: pd.DataFrame) -> str:
+    """Get schema from a pandas DataFrame"""
     dtype_map = df.dtypes.to_dict()
     return ',\n'.join(
             [f'"{col}" {dtype_to_spectrum(dtype)}'
                 for col, dtype in dtype_map.items()
             ]
     )
+
+
+def schema_from_registry(stream: str) -> str:
+    """Using NES schemas endpoint, pull the latest schema from the registry.
+    
+    NES schemas repo coming soon!
+    """
+    endpoint = getenv('NES_SCHEMAS_ENDPOINT')
+    if not endpoint:
+        return schema_from_df(stream)
+
+    key = getenv('NES_SCHEMAS_KEY')
+    url = f'{endpoint}/schema/{stream}/version/latest'
+    response = requests.get(url, headers={'x-api-key': key}).json()
+    parsed = response[0]['columns']
+    return ',\n'.join(
+            [f'''"{dct['name']}" {dct['type']}''' for dct in parsed]
+            )
