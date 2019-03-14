@@ -86,7 +86,7 @@ def schema_from_registry(stream: str) -> str:
     """
     endpoint = getenv('NES_SCHEMAS_ENDPOINT')
     if not endpoint:
-        return schema_from_df(stream)
+        raise ValueError('NES_SCHEMAS_ENDPOINT required in env vars.')
 
     key = getenv('NES_SCHEMAS_KEY')
     url = f'{endpoint}/schema/{stream}/version/latest'
