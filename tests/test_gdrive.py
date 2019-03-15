@@ -23,17 +23,20 @@ def to_gdrive_params():
     )
 
 
+@pytest.mark.skip(reason="Gdrive service not setup yet.")
 def test_metadata(url):
     """Happy path."""
     metadata = gdrive.gdrive_metadata(url)
     assert metadata.title == 'animals.csv'
 
 
+@pytest.mark.skip(reason="Gdrive service not setup yet.")
 def test_metadata_fetch_all(url):
     metadata = gdrive.gdrive_metadata(url, fetch_all=True)
     assert isinstance(metadata, dict)
 
 
+@pytest.mark.skip(reason="Gdrive service not setup yet.")
 def test_gdrive_writes(to_gdrive_params):
     file_name = to_gdrive_params['file_name']
     with open(path.join(gettempdir(), file_name), 'w') as test_file:

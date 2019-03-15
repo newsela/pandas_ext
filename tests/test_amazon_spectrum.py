@@ -24,29 +24,32 @@ def df():
 
 def test_has_partition(df):
     assert 'PARTITIONED BY' in to_spectrum(
+        df,
         'test',
         'my-schema',
         'my-bucket',
         has_partition=True,
-        df=df)
+        )
 
 
 def test_has_no_partition(df):
     assert 'PARTITIONED BY' not in to_spectrum(
+            df,
         'test',
         'my-schema',
         'my-bucket',
         has_partition=False,
-        df=df)
+        )
 
 
 def test_schema_alias(df):
     assert 'CREATE VIEW' in to_spectrum(
+            df,
         'test',
         'my-schema',
         'my-bucket',
         schema_alias='my-new-schema',
-        df=df)
+        )
 
 
 def test_schema_registry():

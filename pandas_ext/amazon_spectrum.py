@@ -117,14 +117,31 @@ def _create_external_table_statement(
         ;"""
                     )
 
+def nes_to_spectrum(
+        s3_prefix: str,
+        table_name: str,
+        external_schema: str,
+        s3_bucket: str,
+        ):
+    """Represents daily files that will automatically get a date partition.
+
+    Here we:
+        Infer schema from the schema registry.
+        Create the schema in our schema registry.
+        Use the schema registry to create the table, if necessary.
+        Add partitions as necessary.
+        Subscribe to adding daily partitions, if necessary.
+
+    NOTE: This function is not ready for public consumption at this time.
+    """
 
 def to_spectrum(
+        df: pd.DataFrame,
         table: str,
         external_schema: str,
         bucket: str,
-        df: pd.DataFrame = pd.DataFrame(),
         schema_alias: str = '',
-        stream: str = '',
+        s3_prefix: str = '',
         file_format: str = 'parquet',
         partition: str = 'dt',
         partition_type: str = 'date',
@@ -138,12 +155,12 @@ def to_spectrum(
        Currently we only print out the statements as only the owner of the
        external schema can actually run the CREATE EXTERNAL TABLE statement.
 
+       df: pandas Dataframe
        table: table name as it appears in Spectrum
        external_schema: external table schema
        bucket: s3 bucket
-       df: pandas Dataframe
        schema_alias: If you want to create an alternate path to your schema
-       stream: Defaults to table if not provided.
+       s3_prefix: Defaults to table if not provided.
        file_format: Defaults to parquet and may expand to avro.
        partition: Defaults to dt, which is short for the date.
        partition_type: The data type declaration of the partition value.
@@ -153,18 +170,15 @@ def to_spectrum(
        has_partition: Remove partition altogether from output
     """
 
-    stream = stream if stream else table
-    columns = (
-            schema_from_df(df)
-            if len(df) != 0 else
-            schema_from_registry(stream)
-        )
+    s3_prefix = s3_prefix if s3_prefix else table
+    columns = schema_from_df(df)
+
     external_table_statement = _create_external_table_statement(
         schema=external_schema,
         table=table,
         columns=columns,
         bucket=bucket,
-        stream=stream,
+        stream=s3_prefix,
         file_format=file_format,
         partition=partition,
         partition_type=partition_type,
@@ -182,7 +196,7 @@ def to_spectrum(
         partition_statement = _create_partition_statement(
             schema=external_schema,
             bucket=bucket,
-            stream=stream,
+            stream=s3_prefix,
             partition=partition,
             partition_value=partition_value
         )
