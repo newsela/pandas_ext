@@ -161,12 +161,12 @@ def gdrive_metadata(url: str, fetch_all=False) -> object:
 
     try:
         metadata['folder_id'] = (
-            None if 'parents' not in metadata
+            None if not metadata['parents']
             else metadata['parents'][0]['id']
         )
     except IndexError:
         raise('The file must reside in a folder that is shared with '
-              'pydrive@namely.com.')
+              '<my-bot>@<my-domain>.com.')
 
     if 'lastModifyingUser' in metadata:
         metadata['last_mod_by_email'] = (
