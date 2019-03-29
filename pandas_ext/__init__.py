@@ -1,5 +1,5 @@
 """Versioning kept here."""
-__version__ = '0.4.12'
+__version__ = '0.4.13'
 __license__ = "MIT"
 
 __title__ = "pandas_ext"
@@ -14,6 +14,7 @@ import pandas as _pd
 
 from .amazon_spectrum import to_spectrum
 from .csv import to_csv
+from .excel import to_excel
 from .gdrive import read_gdrive, to_gdrive
 from .parquet import read_parquet, to_parquet
 from .sfdc import (
@@ -28,6 +29,7 @@ read_csv = _pd.read_csv
 del amazon_spectrum
 del common
 del csv
+del excel
 del gdrive
 del parquet
 del sfdc

@@ -24,5 +24,6 @@ def to_excel(df: pd.DataFrame, file_path: str, engine='', **kwargs) -> None:
         with open(tmp_file, 'rb') as source, s3.open(file_path, 'wb') as dest:
             dest.write(source.read())
         os.remove(tmp_file)
+        return
 
     return df.to_excel(file_path, **kwargs)

@@ -60,6 +60,7 @@ setup(
     version=find_meta("version"),
     license=find_meta("license"),
     install_requires=read("requirements/requirements.in"),
+    extras_require=dict(xls=["xlwt"], xlsx=["openpyxl", "xlsxwriter"]),
     long_description=README,
     packages=PACKAGES,
     classifiers=CLASSIFIERS,
