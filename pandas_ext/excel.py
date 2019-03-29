@@ -9,11 +9,12 @@ import s3fs
 from pandas_ext.common.utils import is_s3_path
 
 
-def to_excel(df: pd.DataFrame, file_path: str, **kwargs) -> None:
+def to_excel(df: pd.DataFrame, file_path: str, engine='', **kwargs) -> None:
     """Given a df, write it to s3 if necessary."""
     if is_s3_path(file_path):
         ext = file_path.split('.')[-1].lower()
-        engine = dict(xls='xlwt', xlsx='xlsxwriter')[ext]
+        if not engine:
+            engine = dict(xls='xlwt', xlsx='xlsxwriter')[ext]
         path_removed = file_path.split('/')[-1]
         tmp_file = os.path.join(gettempdir(), path_removed)
         with pd.ExcelWriter(tmp_file, engine=engine) as writer:
