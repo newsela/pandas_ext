@@ -64,7 +64,7 @@ setup(
         xls=["xlwt"],
         xlsx=["openpyxl", "xlsxwriter"],
         snowflake=["snowflake-sqlalchemy"],
-        )
+        ),
     long_description=README,
     packages=PACKAGES,
     classifiers=CLASSIFIERS,
