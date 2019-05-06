@@ -30,7 +30,7 @@ from .snowflake import read_snowflake, to_snowflake
 # Don't pollute the namespace with the module names:
 del amazon_spectrum
 del common
-del _csv
+del px_csv
 del excel
 del gdrive
 del parquet
