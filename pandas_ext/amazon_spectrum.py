@@ -1,7 +1,6 @@
 from inspect import cleandoc
 
 import pandas as pd
-print(dir(pd))
 
 from pandas_ext.common.utils import today
 from pandas_ext.sqla_utils import schema_from_df

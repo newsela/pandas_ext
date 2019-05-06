@@ -64,6 +64,7 @@ setup(
         xls=["xlwt"],
         xlsx=["openpyxl", "xlsxwriter"],
         snowflake=["snowflake-sqlalchemy"],
+        parquet=["pyarrow"],
         ),
     long_description=README,
     packages=PACKAGES,
