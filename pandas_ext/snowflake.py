@@ -14,6 +14,7 @@ def connect(**kwargs):
     account = getenv('SNOWFLAKE_ACCOUNT')
     database = getenv('SNOWFLAKE_DATABASE')
     warehouse = getenv('SNOWFLAKE_WAREHOUSE')
+    role = getenv('SNOWFLAKE_ROLE')
     return create_engine(
         URL(
             account=account,
@@ -21,16 +22,20 @@ def connect(**kwargs):
             password=password,
             database=database,
             warehouse=warehouse,
+            role=role,
             **kwargs
         )
     )
 
 
-def from_snowflake(sql: str, con=None, **kwargs) -> pd.DataFrame:
-    """Retrieves a query from snowflake."""
+def read_snowflake(sql: str, con=None, **kwargs) -> pd.DataFrame:
+    """Retrieves a query from snowflake.
+    
+    >>> df = read_snowflake('select a from test.test')
+    """
     if con is None:
         con = connect()
-    return pd.read_sql(sql, **kwargs)
+    return pd.read_sql(sql, con, **kwargs)
 
 
 def to_snowflake(
@@ -42,7 +47,11 @@ def to_snowflake(
         if_exists='append',
         **kwargs
 ) -> pd.DataFrame:
-    """Sends the current dataframe to snowflake."""
+    """Sends the current dataframe to snowflake.
+    
+    >>> df = pd.DataFrame(dict(a=[1,2,3],b=[4,5,6]))
+    >>> to_snowflake(df, 'test', 'test')
+    """
     if con is None:
         con = connect()
     df.to_sql(
@@ -56,4 +65,7 @@ def to_snowflake(
 
 
 if __name__ == '__main__':
-    connect()
+    df = pd.DataFrame(dict(a=[1,2,3],b=[4,5,6]))
+    to_snowflake(df, 'test', 'test',)
+    test_df = read_snowflake('select a from test.test')
+    print(test_df)

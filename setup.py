@@ -63,7 +63,7 @@ setup(
     extras_require=dict(
         xls=["xlwt"],
         xlsx=["openpyxl", "xlsxwriter"],
-        snowflake=["snowflake-sqlalchemy"],
+        snowflake=["setuptools>=41.0.1", "snowflake-sqlalchemy"],
         parquet=["pyarrow"],
         ),
     long_description=README,
