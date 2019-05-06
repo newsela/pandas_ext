@@ -11,9 +11,11 @@ __email__ = "devs@newsela.com"
 __uri__ = "https://github.com/newsela/pandas_ext"
 
 import pandas as _pd
+read_csv = _pd.read_csv
+del _pd
 
 from .amazon_spectrum import to_spectrum
-from .csv import to_csv
+from ._csv import to_csv
 from .excel import to_excel
 from .gdrive import read_gdrive, to_gdrive
 from .parquet import read_parquet, to_parquet
@@ -23,15 +25,13 @@ from .sfdc import (
 from .sql import read_sql, list_backends
 
 
-read_csv = _pd.read_csv
 
 # Don't pollute the namespace with the module names:
 del amazon_spectrum
 del common
-del csv
+del _csv
 del excel
 del gdrive
 del parquet
 del sfdc
 del sql
-del _pd
