@@ -8,7 +8,12 @@ from sqlalchemy import create_engine
 
 
 def connect(**kwargs):
-    """Connect to snowflake."""
+    """Connect to snowflake.
+    
+    **kwargs documentation can be found here:
+        https://docs.snowflake.net/manuals/user-guide/sqlalchemy.html#connection-string-examples
+    
+    """
     user = getenv('SNOWFLAKE_USER')
     password = getenv('SNOWFLAKE_PASSWORD')
     account = getenv('SNOWFLAKE_ACCOUNT')
@@ -30,7 +35,9 @@ def connect(**kwargs):
 
 def read_snowflake(sql: str, con=None, **kwargs) -> pd.DataFrame:
     """Retrieves a query from snowflake.
-    
+
+    **kwargs documentation can be found here:
+        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_sql.html
     >>> df = read_snowflake('select a from test.test')
     """
     if con is None:
@@ -48,7 +55,11 @@ def to_snowflake(
         **kwargs
 ) -> pd.DataFrame:
     """Sends the current dataframe to snowflake.
-    
+
+    index, if_exists, and **kwargs documentation can be found here:
+        https://pandas.pydata.org/pandas-docs/version/0.23.4/generated/pandas.DataFrame.to_sql.html
+
+
     >>> df = pd.DataFrame(dict(a=[1,2,3],b=[4,5,6]))
     >>> to_snowflake(df, 'test', 'test')
     """
@@ -65,7 +76,7 @@ def to_snowflake(
 
 
 if __name__ == '__main__':
-    df = pd.DataFrame(dict(a=[1,2,3],b=[4,5,6]))
+    df = pd.DataFrame(dict(a=[1, 2, 3], b=[4, 5, 6]))
     to_snowflake(df, 'test', 'test',)
     test_df = read_snowflake('select a from test.test')
     print(test_df)
