@@ -10,6 +10,8 @@ __email__ = "devs@newsela.com"
 
 __uri__ = "https://github.com/newsela/pandas_ext"
 
+import warnings
+
 import pandas as _pd
 read_csv = _pd.read_csv
 del _pd
@@ -18,14 +20,23 @@ from .amazon_spectrum import to_spectrum
 from .px_csv import to_csv
 from .excel import to_excel
 from .gdrive import read_gdrive, to_gdrive
-from .parquet import read_parquet, to_parquet
+try:
+    from .parquet import read_parquet, to_parquet
+    del parquet
+except ImportError:
+    warnings.warn('For access to parquet module: '
+                  'pip install pandas_ext[parquet]')
+
 from .sfdc import (
     read_sfdc, sfdc_metadata, patch_sfdc, async_patch_sfdc,
 )
 from .sql import read_sql, list_backends
-from .snowflake import read_snowflake, to_snowflake
-
-
+try:
+    from .snowflake import read_snowflake, to_snowflake
+    del snowflake
+except ImportError:
+    warnings.warn('For access to snowflake module: '
+                  'pip install pandas_ext[snowflake]')
 
 # Don't pollute the namespace with the module names:
 del amazon_spectrum
@@ -33,7 +44,5 @@ del common
 del px_csv
 del excel
 del gdrive
-del parquet
 del sfdc
 del sql
-del snowflake

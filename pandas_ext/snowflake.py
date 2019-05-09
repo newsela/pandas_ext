@@ -76,7 +76,5 @@ def to_snowflake(
 
 
 if __name__ == '__main__':
-    df = pd.DataFrame(dict(a=[1, 2, 3], b=[4, 5, 6]))
-    to_snowflake(df, 'test', 'test',)
-    test_df = read_snowflake('select a from test.test')
-    print(test_df)
+    # test connection
+    connect()
