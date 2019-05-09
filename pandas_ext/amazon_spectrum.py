@@ -3,7 +3,6 @@ from inspect import cleandoc
 import pandas as pd
 
 from pandas_ext.common.utils import today
-from pandas_ext.parquet import to_parquet
 from pandas_ext.sqla_utils import schema_from_df
 
 
@@ -177,6 +176,7 @@ def to_spectrum(
         print(f"df_{table} = read_parquet('{s3_path}')")
 
     if conn:
+        from pandas_ext.parquet import to_parquet
         to_parquet(df, s3_path, **kwargs)
         from sqlalchemy import create_engine
         engine = create_engine(conn, execution_options=dict(autocommit=True))
