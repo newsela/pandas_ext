@@ -9,10 +9,10 @@ from sqlalchemy import create_engine
 
 def connect(**kwargs):
     """Connect to snowflake.
-    
+
     **kwargs documentation can be found here:
         https://docs.snowflake.net/manuals/user-guide/sqlalchemy.html#connection-string-examples
-    
+
     """
     user = getenv('SNOWFLAKE_USER')
     password = getenv('SNOWFLAKE_PASSWORD')
