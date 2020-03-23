@@ -7,6 +7,9 @@ from snowflake.sqlalchemy import URL
 from sqlalchemy import create_engine
 
 
+CHUNKSIZE = 16384
+
+
 def connect(**kwargs):
     """Connect to snowflake.
 
@@ -52,6 +55,7 @@ def to_snowflake(
         con=None,
         index=False,
         if_exists='append',
+        chunksize=CHUNKSIZE,
         **kwargs
 ) -> pd.DataFrame:
     """Sends the current dataframe to snowflake.
@@ -71,6 +75,7 @@ def to_snowflake(
         name=table,
         index=index,
         if_exists=if_exists,
+        chunksize=chunksize,
         **kwargs
     )
 
